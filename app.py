@@ -3,86 +3,126 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 menu_data = {
-    "non-veg-starters": {
-        "name": "Non-Veg Starters",
-        "items": [
-            {"name": "Chicken Lollipop", "price": 120, "image": "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Tandoori Chicken", "price": 150, "image": "https://images.unsplash.com/photo-1604909053410-70b7b88e8455?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Chicken Wings", "price": 130, "image": "https://images.unsplash.com/photo-1602333869840-31c0d2d6d43a?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Chicken Seekh Kebab", "price": 140, "image": "https://images.unsplash.com/photo-1598514982885-c3caca46e6ef?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Fish Fingers", "price": 160, "image": "https://images.unsplash.com/photo-1621996346565-47d42fb1504d?auto=format&fit=crop&w=400&q=80"}
-        ]
-    },
-    "veg-starters": {
-        "name": "Veg Starters",
-        "items": [
-            {"name": "Paneer Tikka", "price": 100, "image": "https://images.unsplash.com/photo-1671214068025-5b2e159ea1d7?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Veg Spring Roll", "price": 90, "image": "https://images.unsplash.com/photo-1608219555690-c6018fe49d6c?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Stuffed Mushrooms", "price": 110, "image": "https://images.unsplash.com/photo-1649887324735-2cc586b7e019?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Hara Bhara Kebab", "price": 95, "image": "https://images.unsplash.com/photo-1671047394125-85c3d6bbf0ef?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Crispy Corn", "price": 105, "image": "https://images.unsplash.com/photo-1589308078057-42eeb1d990f4?auto=format&fit=crop&w=400&q=80"}
-        ]
-    },
-    "soups": {
-        "name": "Soups",
-        "items": [
-            {"name": "Sweet Corn Soup", "price": 80, "image": "https://images.unsplash.com/photo-1590080875512-34c5cf4fe7da?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Tomato Soup", "price": 75, "image": "https://images.unsplash.com/photo-1625942082121-395a18b9d2fa?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Hot & Sour Soup", "price": 85, "image": "https://images.unsplash.com/photo-1635687988486-1acdb3fa31f1?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Chicken Soup", "price": 95, "image": "https://images.unsplash.com/photo-1647914445592-b9b20ffb94a9?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Manchow Soup", "price": 90, "image": "https://images.unsplash.com/photo-1606971802640-01486cf9c7d5?auto=format&fit=crop&w=400&q=80"}
-        ]
-    },
-    "fish-sea-food": {
-        "name": "Fish & Sea food",
-        "items": [
-            {"name": "Grilled Fish", "price": 180, "image": "https://images.unsplash.com/photo-1590080875594-4c9f42ef33b4?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Prawn Curry", "price": 200, "image": "https://images.unsplash.com/photo-1663851477021-92f51a016be0?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Fish Tikka", "price": 175, "image": "https://images.unsplash.com/photo-1645918095576-92771d0a6172?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Crab Masala", "price": 220, "image": "https://images.unsplash.com/photo-1629110073342-df8795972403?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Prawn Tempura", "price": 190, "image": "https://images.unsplash.com/photo-1587595431973-160d0d23143a?auto=format&fit=crop&w=400&q=80"}
-        ]
-    },
-    "main-course": {
-        "name": "Main Course",
-        "items": [
-            {"name": "Paneer Butter Masala", "price": 140, "image": "https://images.unsplash.com/photo-1667131668250-f18495df2da5?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Butter Chicken", "price": 160, "image": "https://images.unsplash.com/photo-1620132823300-b6f36f8f6ef1?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Veg Biryani", "price": 130, "image": "https://images.unsplash.com/photo-1626531408623-8826977a39dc?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Chicken Biryani", "price": 150, "image": "https://images.unsplash.com/photo-1605478371312-21504c5ecb45?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Dal Makhani", "price": 120, "image": "https://images.unsplash.com/photo-1668945234707-419405a9dfe1?auto=format&fit=crop&w=400&q=80"}
-        ]
-    },
-    "noodles": {
-        "name": "Noodles",
-        "items": [
-            {"name": "Veg Hakka Noodles", "price": 90, "image": "https://images.unsplash.com/photo-1609336706725-093cc9061b60?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Chicken Noodles", "price": 100, "image": "https://images.unsplash.com/photo-1626808642872-8429bc5b24c5?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Schezwan Noodles", "price": 95, "image": "https://images.unsplash.com/photo-1676213471953-591d57ec1f25?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Egg Noodles", "price": 98, "image": "https://images.unsplash.com/photo-1649998070426-663333f33865?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Mixed Noodles", "price": 110, "image": "https://images.unsplash.com/photo-1615719413546-e772e6bd276e?auto=format&fit=crop&w=400&q=80"}
-        ]
-    },
-    "salads": {
-        "name": "Salads",
-        "items": [
-            {"name": "Caesar Salad", "price": 80, "image": "https://images.unsplash.com/photo-1589308078057-42eeb1d990f4?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Greek Salad", "price": 90, "image": "https://images.unsplash.com/photo-1569058242319-bc1e5d337d37?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Sprout Salad", "price": 70, "image": "https://images.unsplash.com/photo-1632735399262-cab58bfeab41?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Cucumber Salad", "price": 65, "image": "https://images.unsplash.com/photo-1576402187875-4bda2228f42c?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Fruit Salad", "price": 85, "image": "https://images.unsplash.com/photo-1524592515119-2c0bd51d33c4?auto=format&fit=crop&w=400&q=80"}
-        ]
-    },
-    "desserts": {
-        "name": "Desserts",
-        "items": [
-            {"name": "Chocolate Ice Cream", "price": 80, "image": "https://images.unsplash.com/photo-1622012214560-6f5d42f1893e?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Vanilla Ice Cream", "price": 70, "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Pista Ice Cream", "price": 90, "image": "https://images.unsplash.com/photo-1633212219424-84a9468ef738?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Strawberry Ice Cream", "price": 75, "image": "https://images.unsplash.com/photo-1599785209707-28cfed5f0f2f?auto=format&fit=crop&w=400&q=80"},
-            {"name": "Mango Ice Cream", "price": 85, "image": "https://images.unsplash.com/photo-1626882048554-1ff1a94fa47a?auto=format&fit=crop&w=400&q=80"}
-        ]
-    }
+  "non-veg-starters": {
+    "name": "Non‑Veg Starters",
+    "items": [
+      {"name": "Chicken Lollipop", "price": 120, "image": "https://source.unsplash.com/featured/?chicken-lollipop"},
+      {"name": "Tandoori Chicken", "price": 150, "image": "https://source.unsplash.com/featured/?tandoori-chicken"},
+      {"name": "Chicken Wings", "price": 130, "image": "https://source.unsplash.com/featured/?chicken-wings"},
+      {"name": "Chicken Seekh Kebab", "price": 140, "image": "https://source.unsplash.com/featured/?chicken-kebab"},
+      {"name": "Fish Fingers", "price": 160, "image": "https://source.unsplash.com/featured/?fish-fingers"},
+      {"name": "Mutton Shami Kebab", "price": 170, "image": "https://source.unsplash.com/featured/?mutton-kebab"},
+      {"name": "Prawn Tempura", "price": 180, "image": "https://source.unsplash.com/featured/?prawn-tempura"},
+      {"name": "Chicken Malai Tikka", "price": 145, "image": "https://source.unsplash.com/featured/?chicken-tikka"},
+      {"name": "Crispy Fried Chicken", "price": 135, "image": "https://source.unsplash.com/featured/?crispy-chicken"},
+      {"name": "Lamb Chops", "price": 200, "image": "https://source.unsplash.com/featured/?lamb-chops"}
+    ]
+  },
+  "veg-starters": {
+    "name": "Veg Starters",
+    "items": [
+      {"name": "Paneer Tikka", "price": 100, "image": "https://source.unsplash.com/featured/?paneer-tikka"},
+      {"name": "Veg Spring Roll", "price": 130, "image": "https://source.unsplash.com/featured/?spring-rolls"},
+      {"name": "Stuffed Mushrooms", "price": 110, "image": "https://source.unsplash.com/featured/?stuffed-mushrooms"},
+      {"name": "Hara Bhara Kebab", "price": 120, "image": "https://source.unsplash.com/featured/?hara-bhara-kebab"},
+      {"name": "Crispy Corn", "price": 105, "image": "https://source.unsplash.com/featured/?crispy-corn"},
+      {"name": "Aloo Tikki", "price": 85, "image": "https://source.unsplash.com/featured/?aloo-tikki"},
+      {"name": "Veg Samosa", "price": 60, "image": "https://source.unsplash.com/featured/?veg-samosa"},
+      {"name": "Paneer Pakora", "price": 120, "image": "https://source.unsplash.com/featured/?paneer-pakora"},
+      {"name": "Corn Cheese Balls", "price": 110, "image": "https://source.unsplash.com/featured/?cheese-balls"},
+      {"name": "Cheese Garlic Bread", "price": 100, "image": "https://source.unsplash.com/featured/?garlic-bread"}
+    ]
+  },
+  "soups": {
+    "name": "Soups",
+    "items": [
+      {"name": "Sweet Corn Soup", "price": 100, "image": "https://source.unsplash.com/featured/?sweet-corn-soup"},
+      {"name": "Tomato Soup", "price": 125, "image": "https://source.unsplash.com/featured/?tomato-soup"},
+      {"name": "Hot & Sour Soup", "price": 115, "image": "https://source.unsplash.com/featured/?hot-and-sour-soup"},
+      {"name": "Chicken Soup", "price": 150, "image": "https://source.unsplash.com/featured/?chicken-soup"},
+      {"name": "Manchow Soup", "price": 110, "image": "https://source.unsplash.com/featured/?manchow-soup"},
+      {"name": "Veg Clear Soup", "price": 120, "image": "https://source.unsplash.com/featured/?veg-clear-soup"},
+      {"name": "Mushroom Soup", "price": 120, "image": "https://source.unsplash.com/featured/?mushroom-soup"},
+      {"name": "Lentil Soup", "price": 130, "image": "https://source.unsplash.com/featured/?lentil-soup"},
+      {"name": "Minestrone Soup", "price": 100, "image": "https://source.unsplash.com/featured/?minestrone-soup"},
+      {"name": "Broccoli Soup", "price": 140, "image": "https://source.unsplash.com/featured/?broccoli-soup"}
+    ]
+  },
+  "fish-sea-food": {
+    "name": "Fish & Sea Food",
+    "items": [
+      {"name": "Grilled Fish", "price": 180, "image": "https://source.unsplash.com/featured/?grilled-fish"},
+      {"name": "Prawn Curry", "price": 200, "image": "https://source.unsplash.com/featured/?prawn-curry"},
+      {"name": "Fish Tikka", "price": 175, "image": "https://source.unsplash.com/featured/?fish-tikka"},
+      {"name": "Crab Masala", "price": 220, "image": "https://source.unsplash.com/featured/?crab-masala"},
+      {"name": "Prawn Tempura", "price": 190, "image": "https://source.unsplash.com/featured/?tempura"},
+      {"name": "Fish Fry", "price": 170, "image": "https://source.unsplash.com/featured/?fish-fry"},
+      {"name": "Garlic Butter Prawns", "price": 210, "image": "https://source.unsplash.com/featured/?butter-prawns"},
+      {"name": "Squid Rings", "price": 160, "image": "https://source.unsplash.com/featured/?squid-rings"},
+      {"name": "Lobster Tails", "price": 250, "image": "https://source.unsplash.com/featured/?lobster"},
+      {"name": "Seafood Platter", "price": 300, "image": "https://source.unsplash.com/featured/?seafood-platter"}
+    ]
+  },
+  "main-course": {
+    "name": "Main Course",
+    "items": [
+      {"name": "Paneer Butter Masala", "price": 140, "image": "https://source.unsplash.com/featured/?paneer-butter-masala"},
+      {"name": "Butter Chicken", "price": 160, "image": "https://source.unsplash.com/featured/?butter-chicken"},
+      {"name": "Veg Biryani", "price": 130, "image": "https://source.unsplash.com/featured/?veg-biryani"},
+      {"name": "Chicken Biryani", "price": 150, "image": "https://source.unsplash.com/featured/?chicken-biryani"},
+      {"name": "Dal Makhani", "price": 120, "image": "https://source.unsplash.com/featured/?dal-makhani"},
+      {"name": "Mushroom Biryani", "price": 220, "image": "https://source.unsplash.com/featured/?mushroom-biryani"},
+      {"name": "Panner Biryani", "price": 200, "image": "https://source.unsplash.com/featured/?paneer-biryani"},
+      {"name": "Fish Curry", "price": 170, "image": "https://source.unsplash.com/featured/?fish-curry"},
+      {"name": "Mutton Biryani", "price": 200, "image": "https://source.unsplash.com/featured/?mutton-biryani"},
+      {"name": "Paneer Lababdar", "price": 150, "image": "https://source.unsplash.com/featured/?paneer-lababdar"}
+    ]
+  },
+  "noodles": {
+    "name": "Noodles",
+    "items": [
+      {"name": "Veg Hakka Noodles", "price": 100, "image": "https://source.unsplash.com/featured/?hakka-noodles"},
+      {"name": "Chicken Noodles", "price": 100, "image": "https://source.unsplash.com/featured/?chicken-noodles"},
+      {"name": "Schezwan Noodles", "price": 95, "image": "https://source.unsplash.com/featured/?schezwan-noodles"},
+      {"name": "Egg Noodles", "price": 100, "image": "https://source.unsplash.com/featured/?egg-noodles"},
+      {"name": "Mixed Noodles", "price": 110, "image": "https://source.unsplash.com/featured/?mixed-noodles"},
+      {"name": "Singapore Noodles", "price": 120, "image": "https://source.unsplash.com/featured/?singapore-noodles"},
+      {"name": "Schezuan Chicken Noodles", "price": 130, "image": "https://source.unsplash.com/featured/?schezwan-chicken-noodles"},
+      {"name": "Garlic Noodles", "price": 110, "image": "https://source.unsplash.com/featured/?garlic-noodles"},
+      {"name": "Seafood Noodles", "price": 140, "image": "https://source.unsplash.com/featured/?seafood-noodles"},
+      {"name": "Chili Noodles", "price": 100, "image": "https://source.unsplash.com/featured/?chili-noodles"}
+    ]
+  },
+  "salads": {
+    "name": "Salads",
+    "items": [
+      {"name": "Caesar Salad", "price": 80, "image": "https://source.unsplash.com/featured/?caesar-salad"},
+      {"name": "Greek Salad", "price": 90, "image": "https://source.unsplash.com/featured/?greek-salad"},
+      {"name": "Sprout Salad", "price": 70, "image": "https://source.unsplash.com/featured/?sprout-salad"},
+      {"name": "Cucumber Salad", "price": 65, "image": "https://source.unsplash.com/featured/?cucumber-salad"},
+      {"name": "Fruit Salad", "price": 85, "image": "https://source.unsplash.com/featured/?fruit-salad"},
+      {"name": "Pasta Salad", "price": 100, "image": "https://source.unsplash.com/featured/?pasta-salad"},
+      {"name": "Quinoa Salad", "price": 110, "image": "https://source.unsplash.com/featured/?quinoa-salad"},
+      {"name": "Greek Chickpea Salad", "price": 95, "image": "https://source.unsplash.com/featured/?chickpea-salad"},
+      {"name": "Kale & Apple Salad", "price": 105, "image": "https://source.unsplash.com/featured/?kale-apple-salad"},
+      {"name": "Caprese Salad", "price": 120, "image": "https://source.unsplash.com/featured/?caprese-salad"}
+    ]
+  },
+  "desserts": {
+    "name": "Desserts",
+    "items": [
+      {"name": "Chocolate Ice Cream", "price": 80, "image": "https://source.unsplash.com/featured/?chocolate-ice-cream"},
+      {"name": "Vanilla Ice Cream", "price": 70, "image": "https://source.unsplash.com/featured/?vanilla-ice-cream"},
+      {"name": "Pista Ice Cream", "price": 90, "image": "https://source.unsplash.com/featured/?pista-ice-cream"},
+      {"name": "Strawberry Ice Cream", "price": 75, "image": "https://source.unsplash.com/featured/?strawberry-ice-cream"},
+      {"name": "Mango Ice Cream", "price": 85, "image": "https://source.unsplash.com/featured/?mango-ice-cream"},
+      {"name": "Gulab Jamun", "price": 60, "image": "https://source.unsplash.com/featured/?gulab-jamun"},
+      {"name": "Rasmalai", "price": 70, "image": "https://source.unsplash.com/featured/?rasmalai"},
+      {"name": "Brownie with Ice Cream", "price": 120, "image": "https://source.unsplash.com/featured/?brownie-ice-cream"},
+      {"name": "Cheesecake", "price": 130, "image": "https://source.unsplash.com/featured/?cheesecake"},
+      {"name": "Tiramisu", "price": 140, "image": "https://source.unsplash.com/featured/?tiramisu"}
+    ]
+  }
 }
 
 @app.route("/")
@@ -175,3 +215,4 @@ def place_order():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
