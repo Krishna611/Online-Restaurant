@@ -215,4 +215,8 @@ def place_order():
 
 if __name__ == "__main__":
     app.run(debug=True)
+<<<<<<< HEAD
     
+=======
+    
+>>>>>>> abd2d67 (Saved changes before pull)
