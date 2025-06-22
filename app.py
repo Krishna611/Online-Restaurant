@@ -2,6 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+
+# Hardcoded user credentials
+users = {
+    "krishna": {"password": "krishna123"},
+}
+
 menu_data = {
   "non-veg-starters": {
     "name": "Non‑Veg Starters",
@@ -21,14 +27,14 @@ menu_data = {
   "veg-starters": {
     "name": "Veg Starters",
     "items": [
-      {"name": "Paneer Tikka", "price": 100, "image": "https://source.unsplash.com/featured/?paneer-tikka"},
+      {"name": "Panner Tikka", "price": 100, "image": "https://source.unsplash.com/featured/?paneer-tikka"},
       {"name": "Veg Spring Roll", "price": 130, "image": "https://source.unsplash.com/featured/?spring-rolls"},
       {"name": "Stuffed Mushrooms", "price": 110, "image": "https://source.unsplash.com/featured/?stuffed-mushrooms"},
       {"name": "Hara Bhara Kebab", "price": 120, "image": "https://source.unsplash.com/featured/?hara-bhara-kebab"},
       {"name": "Crispy Corn", "price": 105, "image": "https://source.unsplash.com/featured/?crispy-corn"},
       {"name": "Aloo Tikki", "price": 85, "image": "https://source.unsplash.com/featured/?aloo-tikki"},
       {"name": "Veg Samosa", "price": 60, "image": "https://source.unsplash.com/featured/?veg-samosa"},
-      {"name": "Paneer Pakora", "price": 120, "image": "https://source.unsplash.com/featured/?paneer-pakora"},
+      {"name": "Panner Pakora", "price": 120, "image": "https://source.unsplash.com/featured/?paneer-pakora"},
       {"name": "Corn Cheese Balls", "price": 110, "image": "https://source.unsplash.com/featured/?cheese-balls"},
       {"name": "Cheese Garlic Bread", "price": 100, "image": "https://source.unsplash.com/featured/?garlic-bread"}
     ]
@@ -66,7 +72,7 @@ menu_data = {
   "main-course": {
     "name": "Main Course",
     "items": [
-      {"name": "Paneer Butter Masala", "price": 140, "image": "https://source.unsplash.com/featured/?paneer-butter-masala"},
+      {"name": "Panner Butter Masala", "price": 140, "image": "https://source.unsplash.com/featured/?paneer-butter-masala"},
       {"name": "Butter Chicken", "price": 160, "image": "https://source.unsplash.com/featured/?butter-chicken"},
       {"name": "Veg Biryani", "price": 130, "image": "https://source.unsplash.com/featured/?veg-biryani"},
       {"name": "Chicken Biryani", "price": 150, "image": "https://source.unsplash.com/featured/?chicken-biryani"},
@@ -75,7 +81,7 @@ menu_data = {
       {"name": "Panner Biryani", "price": 200, "image": "https://source.unsplash.com/featured/?paneer-biryani"},
       {"name": "Fish Curry", "price": 170, "image": "https://source.unsplash.com/featured/?fish-curry"},
       {"name": "Mutton Biryani", "price": 200, "image": "https://source.unsplash.com/featured/?mutton-biryani"},
-      {"name": "Paneer Lababdar", "price": 150, "image": "https://source.unsplash.com/featured/?paneer-lababdar"}
+      {"name": "Panner Lababdar", "price": 150, "image": "https://source.unsplash.com/featured/?paneer-lababdar"}
     ]
   },
   "noodles": {
@@ -125,17 +131,24 @@ menu_data = {
   }
 }
 
+# 🏠 Home Page
 @app.route("/")
 def home():
     return render_template("index.html", menu_data=menu_data)
 
+# 🍽️ Category Page
 @app.route("/category/<category_name>")
 def category_page(category_name):
     if category_name in menu_data:
-        return render_template("category.html", category_name=menu_data[category_name]["name"], items=menu_data[category_name]["items"])
+        return render_template(
+            "category.html",
+            category_name=menu_data[category_name]["name"],
+            items=menu_data[category_name]["items"]
+        )
     else:
         return "Category not found", 404
 
+# ➕ Add to Cart
 @app.route("/add-to-cart", methods=["POST"])
 def add_to_cart():
     item_name = request.form['name']
@@ -160,12 +173,16 @@ def add_to_cart():
     session.modified = True
     return redirect(request.referrer or url_for('home'))
 
+# 🛒 Cart Page - Login Required
 @app.route("/cart")
 def view_cart():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     cart = session.get('cart', [])
     total = sum(int(item['price']) * item['quantity'] for item in cart)
     return render_template("cart.html", cart=cart, total=total)
 
+# ❌ Remove from Cart
 @app.route("/remove-from-cart/<item_name>")
 def remove_from_cart(item_name):
     if 'cart' in session:
@@ -173,11 +190,11 @@ def remove_from_cart(item_name):
         session.modified = True
     return redirect(url_for('view_cart'))
 
+# 🔁 Update Quantity
 @app.route("/update-quantity", methods=["POST"])
 def update_quantity():
     item_name = request.form['name']
     action = request.form['action']
-
     for item in session.get('cart', []):
         if item['name'] == item_name:
             if action == 'increase':
@@ -187,36 +204,68 @@ def update_quantity():
                 if item['quantity'] < 1:
                     session['cart'].remove(item)
             break
-
     session.modified = True
     return redirect(url_for('view_cart'))
 
+# 💳 Checkout Page - Login Required
 @app.route("/checkout", methods=["GET"])
 def checkout():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     cart = session.get('cart', [])
     total = sum(int(item['price']) * item['quantity'] for item in cart)
     return render_template("checkout.html", cart=cart, total=total)
 
+# ✅ Place Order - Login Required
 @app.route("/place-order", methods=["POST"])
 def place_order():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
     name = request.form['name']
     address = request.form['address']
     payment_method = request.form['payment_method']
     cart = session.get('cart', [])
     total = sum(int(item['price']) * item['quantity'] for item in cart)
 
-    # Simulate saving order (you could save to database here)
-    session.pop('cart', None)  # clear cart after placing order
+    # Simulate saving order
+    session.pop('cart', None)
 
     return f"<h2>Thank you, {name}!</h2><p>Your order has been placed.<br>Delivery Address: {address}<br>Payment Method: {payment_method}<br><strong>Total Paid: ₹{total}</strong></p><a href='/'>Back to Home</a>"
+
+# 🔑 Login Page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username in users and users[username]['password'] == password:
+            session['username'] = username
+            return redirect(url_for('home'))
+        else:
+            return render_template('login.html', error="Invalid username or password.")
+    return render_template('login.html')
+
+# 🚪 Logout
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('home'))
+  
+@app.route('/search')
+def search():
+    query = request.args.get('q', '').lower()
+    results = []
+
+    for category in menu_data.values():
+        for item in category['items']:
+            if query in item['name'].lower():
+                results.append(item)
+
+    return render_template('search_results.html', query=query, results=results)
 
 
 # === MAIN ENTRY POINT ===
 
 if __name__ == "__main__":
     app.run(debug=True)
-<<<<<<< HEAD
-    
-=======
-    
->>>>>>> abd2d67 (Saved changes before pull)

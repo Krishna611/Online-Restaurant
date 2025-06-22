@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Search Results for "{{ query }}"</h2>
+    {% if results %}
+        <div class="row">
+            {% for item in results %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ item.image }}" class="card-img-top" alt="{{ item.name }}">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            <p class="card-text">₹{{ item.price }}</p>
+                            <form action="{{ url_for('add_to_cart') }}" method="POST">
+                                <input type="hidden" name="name" value="{{ item.name }}">
+                                <input type="hidden" name="price" value="{{ item.price }}">
+                                <input type="hidden" name="image" value="{{ item.image }}">
+                                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No matching items found.</p>
+    {% endif %}
+    <a href="{{ url_for('home') }}" class="btn btn-secondary mt-3">← Back to Home</a>
+</div>
+</body>
+</html>
